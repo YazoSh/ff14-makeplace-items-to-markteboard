@@ -3,6 +3,8 @@ import re
 import requests
 import sys
 
+itemList = []
+
 def getId(name):
     for id in itemDB:
         if itemDB[id].startswith(name):
@@ -19,6 +21,12 @@ def getCheapest(listings):
             cheapest = list['pricePerUnit']
     return cheapest
 
+def getAmount(itemId):
+    for item in itemList:
+        if item['id'] == itemId:
+            return item['amount']
+    return 0
+
 with open('items.json') as itemsFile:
     itemDB = json.load(itemsFile)
 
@@ -26,8 +34,6 @@ itemRegx = re.compile(r'^(.+):\s(\d+)$')
 sectionRegx = re.compile(r'((.|(?<=.)\n)+=+\n(.|(?<=\w)\n)+)')
 
 ### Parse the item list file
-itemList = []
-
 with open(sys.argv[1]) as shopListFile:
     shopList = shopListFile.read()
     sections = sectionRegx.findall(shopList)
@@ -45,7 +51,7 @@ with open(sys.argv[1]) as shopListFile:
             item = {}
             item['item'] = match.group(1)
             item['id'] = getId(match.group(1))
-            item['amount'] = match.group(2)
+            item['amount'] = int(match.group(2))
             itemList.append(item)
 
 shoppingList = {}
@@ -68,16 +74,26 @@ for r in range(0, len(itemList), 100):
     for itemId in resJson['items']:
         chp = getCheapest(resJson['items'][itemId]['listings'])
         chpItem = {}
+        chpItem['id'] = str(itemId)
         chpItem['name'] = getName(itemId)
+        chpItem['amount'] = getAmount(itemId)
         chpItem['pricePerUnit'] = chp['pricePerUnit']
         if not chp['worldName'] in shoppingList:
             shoppingList[chp['worldName']] = []
         shoppingList[chp['worldName']].append(chpItem)
 
+    if len(resJson['unresolvedItems']) > 0:
+        shoppingList['unresolvedItems'] = []
+        for itemId in resJson['unresolvedItems']:
+            mitem = {}
+            mitem['name'] = getName(str(itemId))
+            mitem['id'] = str(itemId)
+            mitem['pricePerUnit'] = 0
+            shoppingList['unresolvedItems'].append(mitem)
 
 ### Print the list
 for world in shoppingList:
     print(world + '\n===============')
     for item in shoppingList[world]:
-        print(item['name'] + "   (Unit price: " + str(item['pricePerUnit']) + ")")
+        print(str(getAmount(item['id'])) + " " + item['name'] + "   (Unit price: " + str(item['pricePerUnit']) + ")")
     print('\n')
