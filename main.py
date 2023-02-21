@@ -92,8 +92,13 @@ for r in range(0, len(itemList), 100):
             shoppingList['unresolvedItems'].append(mitem)
 
 ### Print the list
+
+subTotal = 0
+
 for world in shoppingList:
     print(world + '\n===============')
     for item in shoppingList[world]:
         print(str(getAmount(item['id'])) + " " + item['name'] + "   (Unit price: " + str(item['pricePerUnit']) + ")")
+        subTotal += item['pricePerUnit'] * getAmount(item['id'])
     print('\n')
+print('subTotal: ' + str(subTotal) + ' gil')
