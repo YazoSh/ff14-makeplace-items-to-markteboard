@@ -78,6 +78,7 @@ for r in range(0, len(itemList), 100):
         chpItem['name'] = getName(itemId)
         chpItem['amount'] = getAmount(itemId)
         chpItem['pricePerUnit'] = chp['pricePerUnit']
+        chpItem['craftable'] = chp['isCrafted']
         if not chp['worldName'] in shoppingList:
             shoppingList[chp['worldName']] = []
         shoppingList[chp['worldName']].append(chpItem)
@@ -89,6 +90,7 @@ for r in range(0, len(itemList), 100):
             mitem['name'] = getName(str(itemId))
             mitem['id'] = str(itemId)
             mitem['pricePerUnit'] = 0
+            mitem['craftable'] = 'unknown'
             shoppingList['unresolvedItems'].append(mitem)
 
 ### Print the list
@@ -98,7 +100,7 @@ subTotal = 0
 for world in shoppingList:
     print(world + '\n===============')
     for item in shoppingList[world]:
-        print(str(getAmount(item['id'])) + " " + item['name'] + "   (Unit price: " + str(item['pricePerUnit']) + ")")
+        print(str(getAmount(item['id'])) + "\t" + item['name'] + "   (Unit price: " + str(item['pricePerUnit']) + ")" + "\tCraftable: " + str(item['craftable']))
         subTotal += item['pricePerUnit'] * getAmount(item['id'])
     print('\n')
 print('subTotal: ' + str(subTotal) + ' gil')
