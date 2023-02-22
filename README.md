@@ -18,3 +18,6 @@ optional arguments:
                         name. default is Light
 
 Have fun :)
+
+Uses the Universalis API to obtain Final Fantasy 14 Marketboard info
+https://docs.universalis.app/#market-board-current-data
